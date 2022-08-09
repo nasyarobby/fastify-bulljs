@@ -1,7 +1,9 @@
 version: "3.3"
 services:
+  redis:
+    image: redis
   api:
-    image: # edit this
+    image: localhost:5000/fastify-bulljs
     ports:
       - 3000:3000
     volumes:
