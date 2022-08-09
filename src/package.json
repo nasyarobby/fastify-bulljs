@@ -21,6 +21,7 @@
     "prettier": "^2.2.1"
   },
   "dependencies": {
+    "bull": "^4.8.5",
     "djp-api": "^1.2.0",
     "ioredis": "^4.24.2"
   }
