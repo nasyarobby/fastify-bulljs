@@ -12,13 +12,53 @@
   ],
   "paths": {
     "/worker/load1107put02/{npwp}/{spt_id}": {
+      "get": {
+        "tags": [
+          "Worker"
+        ],
+        "summary": "root folder",
+        "description": "",
+        "operationId": "getJobLoadLampiranPut02",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "npwp",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "spt_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+      ,
       "post": {
         "tags": [
           "Worker"
         ],
         "summary": "root folder",
-        "description": "Get API status",
-        "operationId": "getRoot",
+        "description": "",
+        "operationId": "createJobLoadLampiranPut02",
         "parameters": [
           {
             "in": "path",
