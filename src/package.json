@@ -23,6 +23,8 @@
   "dependencies": {
     "bull": "^4.8.5",
     "djp-api": "^1.2.0",
-    "ioredis": "^4.24.2"
+    "ioredis": "^4.24.2",
+    "knex": "^2.2.0",
+    "oracledb": "^5.4.0"
   }
 }
