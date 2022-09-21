@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-const { LoadPut02Queue } = require('../app/controllers/Queue');
+const { LoadPut03Queue } = require('../app/controllers/Queue');
 const db = require('../app/db');
 const { default: status } = require('./status');
 
@@ -22,32 +22,32 @@ function processJobLoadPut02(job) {
   });
 }
 
-LoadPut02Queue.process(processJobLoadPut02);
+LoadPut03Queue.process(processJobLoadPut02);
 
 async function updateDbStatusError(job, err) {
-  console.log(`ERROR: Job LoadPUT02:${job.id}`, { err });
+  console.log(`ERROR: Job LoadPUT03:${job.id}`, { err });
   return db('SPT_1107PUT').where('ID', job.data.sptId).update({
-    WPUT02_STATUS: status.ERROR,
-    WPUT02_TIMESTAMP: new Date(),
+    WPUT03_STATUS: status.ERROR,
+    WPUT03_TIMESTAMP: new Date(),
   });
 }
 
 // when a new job is active, print to console
-LoadPut02Queue.on('active', async (job) => {
-  console.log(`STARTED: Job LoadPUT02:${job.id}`);
+LoadPut03Queue.on('active', async (job) => {
+  console.log(`STARTED: Job LoadPUT03:${job.id}`);
   return db('SPT_1107PUT').where('ID', job.data.sptId).update({
-    WPUT02_STATUS: status.PROCESSING,
-    WPUT02_TIMESTAMP: new Date(),
+    WPUT03_STATUS: status.PROCESSING,
+    WPUT03_TIMESTAMP: new Date(),
   });
 });
 
 // On job completed, print to console job is completed
-LoadPut02Queue.on('completed', async (job) => {
-  console.log(`DONE: Job LoadPUT02:${job.id}`);
+LoadPut03Queue.on('completed', async (job) => {
+  console.log(`DONE: Job LoadPUT03:${job.id}`);
   return db('SPT_1107PUT').where('ID', job.data.sptId).update({
-    WPUT02_STATUS: status.DONE,
-    WPUT02_TIMESTAMP: new Date(),
+    WPUT03_STATUS: status.DONE,
+    WPUT03_TIMESTAMP: new Date(),
   });
 });
 
-LoadPut02Queue.on('failed', updateDbStatusError);
+LoadPut03Queue.on('failed', updateDbStatusError);

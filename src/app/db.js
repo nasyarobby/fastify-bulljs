@@ -15,4 +15,4 @@ const knex = require('knex')({
   debug: process.env.NODE_ENV !== 'production',
 });
 
-module.exports = knex
+module.exports = knex;

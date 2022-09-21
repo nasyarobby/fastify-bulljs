@@ -1,10 +1,10 @@
-const { LoadPut02Queue } = require('../Queue');
+const { LoadPut03Queue } = require('../Queue');
 
 module.exports = async function getRoot(req, res) {
   const { npwp } = req.params;
   const sptId = req.params.spt_id;
   const jobId = `${npwp}:${sptId}`;
-  const exists = await LoadPut02Queue.getJobFromId(jobId);
+  const exists = await LoadPut03Queue.getJobFromId(jobId);
   if (exists) {
     const status = await exists.getState();
     if (status === 'failed') {
@@ -23,6 +23,6 @@ module.exports = async function getRoot(req, res) {
     );
   }
 
-  const job = await LoadPut02Queue.add({ npwp, sptId }, { jobId, removeOnComplete: true });
+  const job = await LoadPut03Queue.add({ npwp, sptId }, { jobId, removeOnComplete: true });
   return res.xsend('Berhasil menambahkan job', { job }, { code: 'JOB_ADDED' });
 };
