@@ -5,8 +5,9 @@ const db = require('../../db');
 module.exports = async function getRoot(req, res) {
   const { npwp } = req.params;
   const sptId = req.params.spt_id;
-  const job = await LoadPut02Queue.getJob(`${npwp}:${sptId}`);
-  const spt = await db('SPT_1107PUT').where('ID', sptId).where('NPWP', npwp).first();
+  const jobPromise = LoadPut02Queue.getJob(`${npwp}:${sptId}`);
+  const sptPromise = db('SPT_1107PUT').where('ID', sptId).where('NPWP', npwp).first();
+  const [job, spt] = await Promise.all([jobPromise, sptPromise]);
 
   if (job) {
     const status = await job.getState();
