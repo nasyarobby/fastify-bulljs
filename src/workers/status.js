@@ -1,5 +1,5 @@
 exports.default = {
-  PENDING: 0,
+  UNSYNCED: 0,
   WAITING: 1,
   PROCESSING: 2,
   DONE: 3,

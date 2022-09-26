@@ -27,7 +27,7 @@ const getJobSummarize = async () => {
   const pending = await db('SPT_1107PUT')
     .where('WPUT02_STATUS', STATUS.DONE)
     .where('WPUT03_STATUS', STATUS.DONE)
-    .whereIn('WSUMMARY_STATUS', [STATUS.WAITING, STATUS.PENDING])
+    .whereIn('WSUMMARY_STATUS', [STATUS.WAITING, STATUS.UNSYNCED])
     .where('SUBMITTED_AT', null);
   return pending;
 };
