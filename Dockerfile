@@ -4,8 +4,11 @@ RUN microdnf  -y install oracle-instantclient-release-el8
 RUN microdnf  -y install oracle-instantclient-basic nodejs 
 RUN microdnf -y install npm
 RUN npm --location=global install pm2 yarn
+RUN microdnf -y install java-1.8.0-openjdk
 
 WORKDIR /server
+
+
 COPY src/package*.json ./
 RUN yarn install --production
 COPY src/ /server
