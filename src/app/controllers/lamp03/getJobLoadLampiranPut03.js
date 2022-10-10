@@ -5,7 +5,9 @@ const db = require('../../db');
 module.exports = async function getRoot(req, res) {
   const { npwp } = req.params;
   const sptId = req.params.spt_id;
-  const job = await LoadPut03Queue.getJob(`${npwp}:${sptId}`);
+  const jobId = `${npwp}:${sptId}`;
+  const job = await LoadPut03Queue.getJob(jobId);
+  const logs = await LoadPut03Queue.getJobLogs(jobId);
   const spt = await db('SPT_1107PUT').where('ID', sptId).where('NPWP', npwp).first();
   if (job) {
     const status = await job.getState();
@@ -13,6 +15,7 @@ module.exports = async function getRoot(req, res) {
       'Berhasil mengambil data job',
       {
         job: Object.assign(job, { status }),
+        logs,
         db: _.pick(spt, ['WPUT03_STATUS', 'WPUT03_TIMESTAMP']),
       },
       { code: 'JOB_FOUND' }
