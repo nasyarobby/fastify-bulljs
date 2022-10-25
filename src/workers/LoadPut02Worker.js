@@ -1,48 +1,65 @@
 /* eslint-disable no-console */
+const { spawn } = require('child_process');
 const { LoadPut02Queue } = require('../app/controllers/Queue');
 const db = require('../app/db');
-const { generateFakturPajak } = require('./dev/createFakturPajak');
+// const { generateFakturPajak } = require('./dev/createFakturPajak');
 const { default: status } = require('./status');
 
 /**
  *
  * @param {import("bull/lib/job")} job
  */
-async function processJobLoadPut02(job) {
-  const { npwp, sptId } = job.data;
-  console.log({ npwp, sptId });
-  const draft = await db('SPT_1107PUT')
-    .where('ID', sptId)
-    .whereNull('DELETED_AT')
-    .whereNull('SUBMITTED_AT')
-    .first();
-  if (!draft) throw new Error('Draft tidak ditemukan');
-  await db('LAMP_PUT02').where('ID_SPT', sptId).delete();
-  const data = generateFakturPajak(npwp, 100, draft.TH_PAJAK, draft.MS_PAJAK);
-  return data.reduce(async (prev, fp, index, array) => {
-    await prev;
-    if (fp.id)
-      return db('LAMP_PUT02').insert({
-        ID_SPT: sptId,
-        ID_FAKTUR: fp.id,
-        NPWP_PEMUNGUT: fp.npwpPemungut,
-        NPWP_REKANAN: fp.npwpRekanan,
-        NAMA_REKANAN: fp.namaRekanan,
-        NOMOR_FAKTUR: fp.nomorFaktur,
-        TANGGAL_FAKTUR: new Date(fp.tanggalFaktur),
-        ID_FAKTUR_DIGANTI: fp.fpDiganti,
-        DPP: fp.dpp,
-        PPN: fp.ppn,
-        PPNBM: fp.ppnbm,
-        MASA_PAJAK: fp.masaPajak,
-        TAHUN_PAJAK: fp.tahunPajak,
-        KODE_JENIS_TRANSAKSI: fp.kdJenisTransaksi,
-        STATUS_FAKTUR: fp.statusFaktur,
-        CREATED_AT: new Date(),
-      });
-    console.log({ fp });
-    return null;
-  }, Promise.resolve());
+function processJobLoadPut02(job) {
+  return new Promise((res, rej) => {
+    const { npwp, sptId } = job.data;
+    const child = spawn(
+      `java`,
+      ['-Duser.timezone=UTC', '-jar', './workers/bin/load-put2-1.3.jar', npwp, sptId, 100],
+      { shell: '/bin/bash' }
+    );
+    let currentError;
+    child.stdout.on('data', (chunk) => {
+      Buffer.from(chunk)
+        .toString()
+        .split('\n')
+        .forEach((row, index) => {
+          try {
+            if (row) job.log(row);
+            // const {
+            //   // status,
+            //   // message,
+            //   // idSpt,
+            //   totalData,
+            //   processed,
+            // } = JSON.parse(row);
+            // const progress = Math.ceil((processed * 100) / totalData);
+            job.progress(index);
+          } catch (err) {
+            if (err.name === 'SyntaxError') {
+              console.log(row);
+            } else {
+              throw err;
+            }
+          }
+        });
+    });
+
+    child.stderr.on('data', (chunk) => {
+      console.log(Buffer.from(chunk).toString());
+    });
+
+    child.on('error', (err) => {
+      console.log('ERROR!');
+      console.error(err);
+      currentError = err;
+    });
+
+    child.on('close', (code) => {
+      console.log('Closed ', code);
+      if (code === 1) rej(currentError);
+      return res('ok');
+    });
+  });
 }
 
 LoadPut02Queue.process(processJobLoadPut02);
@@ -59,6 +76,8 @@ async function updateDbStatusError(job, err) {
 LoadPut02Queue.on('active', async (job) => {
   console.log(`STARTED: Job LoadPUT02:${job.id}`);
   return db('SPT_1107PUT').where('ID', job.data.sptId).update({
+    WSUMMARY_STATUS: status.UNSYNCED,
+    WSUMMARY_TIMESTAMP: new Date(),
     WPUT02_STATUS: status.PROCESSING,
     WPUT02_TIMESTAMP: new Date(),
   });

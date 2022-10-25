@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+const { spawn } = require('child_process');
 const { SummarizeQueue } = require('../app/controllers/Queue');
 const db = require('../app/db');
 const { default: status } = require('./status');
@@ -9,16 +10,47 @@ const { default: status } = require('./status');
  */
 function processSummarize(job) {
   return new Promise((res) => {
-    let x = 10;
-    const fn = setInterval(() => {
-      x += 10;
-      job.progress(x);
-      if (x === 50) {
-        clearInterval(fn);
-        res('OK');
-      }
-      // if (Math.random() * 2 > 1) rej(new Error('Ups, error.'));
-    }, 5000);
+    const { npwp, sptId } = job.data;
+    console.log('Started');
+    const child = spawn(
+      `java`,
+      ['-Duser.timezone=UTC', '-jar', './workers/bin/load-SPT-1.5.jar', npwp, sptId],
+      { shell: '/bin/bash' }
+    );
+    child.stdout.on('data', (chunk) => {
+      Buffer.from(chunk)
+        .toString()
+        .split('\n')
+        .forEach((row) => {
+          try {
+            console.log(row);
+            const {
+              // status,
+              // message,
+              // idSpt,
+              totalData,
+              processed,
+            } = JSON.parse(row);
+            const progress = Math.ceil((processed * 100) / totalData);
+            job.progress(progress);
+          } catch (err) {
+            if (err.name === 'SyntaxError') {
+              console.log(row);
+            } else {
+              throw err;
+            }
+          }
+        });
+    });
+
+    child.stderr.on('data', (chunk) => {
+      console.log(Buffer.from(chunk).toString());
+    });
+
+    child.on('close', (code) => {
+      console.log('Closed ', code);
+      return res('ok');
+    });
   });
 }
 
