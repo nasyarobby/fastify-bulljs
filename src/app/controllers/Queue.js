@@ -8,12 +8,21 @@ const redisUrl =
         createClient: process.env.REDIS_SENTINEL ? redis.createClientSentinel : redis,
       };
 
-const LoadPut02Queue = new Queue('load-put-02', redisUrl);
-const LoadPut03Queue = new Queue('load-put-03', redisUrl);
-const SummarizeQueue = new Queue('summarize', redisUrl);
-const LoadPut02Producer = new Queue('load-put-02-producer', redisUrl);
-const LoadPut03Producer = new Queue('load-put-03-producer', redisUrl);
-const SummarizeProducer = new Queue('summarize-producer', redisUrl);
+const defaultJobOptions = {
+  removeOnComplete: { age: 90 * 24 * 3600 },
+  removeOnFail: { age: 90 * 24 * 3600 },
+};
+
+const queueOptions = redisUrl.createClient
+  ? [{ ...redisUrl, defaultJobOptions }]
+  : [redisUrl, { defaultJobOptions }];
+
+const LoadPut02Queue = new Queue('load-put-02', ...queueOptions);
+const LoadPut03Queue = new Queue('load-put-03', ...queueOptions);
+const SummarizeQueue = new Queue('summarize', ...queueOptions);
+const LoadPut02Producer = new Queue('load-put-02-producer', ...queueOptions);
+const LoadPut03Producer = new Queue('load-put-03-producer', ...queueOptions);
+const SummarizeProducer = new Queue('summarize-producer', ...queueOptions);
 
 module.exports = {
   LoadPut02Queue,
