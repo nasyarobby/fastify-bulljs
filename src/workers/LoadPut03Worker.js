@@ -13,7 +13,7 @@ function processJobLoadPut03(job) {
     const { npwp, sptId } = job.data;
     const child = spawn(
       `java`,
-      ['-Duser.timezone=UTC', '-jar', './workers/bin/load-put3-1.6.jar', npwp, sptId],
+      ['-Duser.timezone=UTC', '-jar', './workers/bin/load-put3-1.7.jar', npwp, sptId],
       { shell: '/bin/bash' }
     );
     let currentError;
