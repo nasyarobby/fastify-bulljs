@@ -1,9 +1,13 @@
-FROM openjdk:latest
-RUN microdnf  -y module enable nodejs:16
-RUN microdnf  -y install oracle-instantclient-release-el8
-RUN microdnf  -y install oracle-instantclient-basic nodejs 
-RUN microdnf -y install npm
-RUN npm --location=global install pm2 yarn
+FROM node:14.19.3-stretch
+RUN apt-get update && apt-get install -y openjdk-8-jdk
+
+RUN yarn global add pm2
+
+
+RUN apt-get install -y libaio1 alien
+RUN wget http://yum.oracle.com/repo/OracleLinux/OL7/oracle/instantclient/x86_64/getPackage/oracle-instantclient19.6-basic-19.6.0.0.0-1.x86_64.rpm
+RUN alien -i --scripts oracle-instantclient*.rpm
+RUN rm -f oracle-instantclient*.rpm  
 
 WORKDIR /server
 
