@@ -32,7 +32,7 @@ const getJobSummarize = async () => {
   return pending;
 };
 
-LoadPut02Producer.add({}, { jobId: 'LoadPut02Queue', repeat: { cron: '*/5 * * * * *' } });
+LoadPut02Producer.add({}, { jobId: 'LoadPut02Queue', repeat: { cron: '*/1 * * * *' } });
 
 LoadPut02Producer.process(() =>
   getJobLoadLampiranPut02().then((jobs) => {
@@ -45,7 +45,7 @@ LoadPut02Producer.process(() =>
   })
 );
 
-LoadPut03Producer.add({}, { jobId: 'LoadPut03Queue', repeat: { cron: '*/5 * * * * *' } });
+LoadPut03Producer.add({}, { jobId: 'LoadPut03Queue', repeat: { cron: '*/1 * * * *' } });
 
 LoadPut03Producer.process(() =>
   getJobLoadLampiranPut03().then((jobs) => {
@@ -58,7 +58,7 @@ LoadPut03Producer.process(() =>
   })
 );
 
-SummarizeProducer.add({}, { jobId: 'SummarizeQueue', repeat: { cron: '*/5 * * * * *' } });
+SummarizeProducer.add({}, { jobId: 'SummarizeQueue', repeat: { cron: '*/1 * * * *' } });
 
 SummarizeProducer.process(() =>
   getJobSummarize().then((jobs) => {

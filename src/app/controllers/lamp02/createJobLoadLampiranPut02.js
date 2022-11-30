@@ -5,6 +5,7 @@ module.exports = async function getRoot(req, res) {
   const sptId = req.params.spt_id;
   const jobId = `${npwp}:${sptId}`;
   const exists = await LoadPut02Queue.getJobFromId(jobId);
+  req.log.trace({ exists, sptId, jobId, npwp }, 'Data from Queue PUT2');
   if (exists) {
     const status = await exists.getState();
     if (status === 'failed') {
@@ -24,5 +25,7 @@ module.exports = async function getRoot(req, res) {
   }
 
   const job = await LoadPut02Queue.add({ npwp, sptId }, { jobId, removeOnComplete: true });
+  req.log.trace({ job }, 'PUT2 Job added');
+
   return res.xsend('Berhasil menambahkan job', { job }, { code: 'JOB_ADDED' });
 };
