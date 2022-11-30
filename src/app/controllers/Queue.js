@@ -9,8 +9,8 @@ const redisUrl =
       };
 
 const defaultJobOptions = {
-  removeOnComplete: { age: 90 * 24 * 3600 },
-  removeOnFail: { age: 90 * 24 * 3600 },
+  removeOnComplete: 100,
+  removeOnFail: 500,
 };
 
 const queueOptions = redisUrl.createClient
