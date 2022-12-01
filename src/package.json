@@ -30,6 +30,7 @@
     "lodash": "^4.17.21",
     "objection": "^3.0.1",
     "oracledb": "^5.4.0",
+    "pino": "^8.7.0",
     "query-string": "^7.1.1"
   }
 }

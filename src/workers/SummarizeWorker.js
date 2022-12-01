@@ -2,7 +2,7 @@
 const { spawn } = require('child_process');
 const { SummarizeQueue } = require('../app/controllers/Queue');
 const db = require('../app/db');
-const { default: status } = require('./status');
+const { default: status } = require('./libs/status');
 
 /**
  *

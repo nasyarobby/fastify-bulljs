@@ -56,7 +56,7 @@ function generateFp(npwpPemungut, numbers = 10, startId = 10000, nomorStartsFrom
 
 function generatePembetulanFp(data) {
   let lastId = Math.max(...data.map((row) => row.id));
-  let prevNomor = Number(data[data.length - 1].nomorFaktur);
+  // const prevNomor = Number(data[data.length - 1].nomorFaktur);
   const dibetulkan = [];
   const pembetulan = data.map((fp) => {
     const random = randomInteger(10, 1);

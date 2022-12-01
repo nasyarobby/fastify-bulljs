@@ -1,5 +1,5 @@
 const db = require('../../db');
-const { default: status } = require('../../../workers/status');
+const { default: status } = require('../../../workers/libs/status');
 
 module.exports = async function createJobSummarize(req, res) {
   const { npwp } = req.params;

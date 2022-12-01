@@ -7,7 +7,11 @@ const {
   LoadPut03Queue,
   SummarizeQueue,
 } = require('../app/controllers/Queue');
-const { default: STATUS } = require('./status');
+const { default: STATUS } = require('./libs/status');
+const { Logger } = require('./libs/Logger');
+const WorkerNameList = require('./libs/WorkerNameList');
+
+const log = Logger(WorkerNameList.PRODUCER);
 
 // get from table SPT_1107PUT WHERE WSPUT03_STATUS = 1
 const getJobLoadLampiranPut03 = async () => {
@@ -36,12 +40,15 @@ LoadPut02Producer.add({}, { jobId: 'LoadPut02Queue', repeat: { cron: '*/1 * * * 
 
 LoadPut02Producer.process(() =>
   getJobLoadLampiranPut02().then((jobs) => {
-    LoadPut02Queue.addBulk(
-      jobs.map((job) => ({
-        data: { npwp: job.NPWP, sptId: job.ID },
-        opts: { jobId: `${job.NPWP}:${job.ID}`, removeOnComplete: true },
-      }))
-    );
+    if (jobs.length) {
+      log.debug({}, 'LoadPut02Producer: %d jobs', jobs.length);
+      LoadPut02Queue.addBulk(
+        jobs.map((job) => ({
+          data: { npwp: job.NPWP, sptId: job.ID },
+          opts: { jobId: `${job.NPWP}:${job.ID}`, removeOnComplete: true },
+        }))
+      );
+    }
   })
 );
 
@@ -49,12 +56,15 @@ LoadPut03Producer.add({}, { jobId: 'LoadPut03Queue', repeat: { cron: '*/1 * * * 
 
 LoadPut03Producer.process(() =>
   getJobLoadLampiranPut03().then((jobs) => {
-    LoadPut03Queue.addBulk(
-      jobs.map((job) => ({
-        data: { npwp: job.NPWP, sptId: job.ID },
-        opts: { jobId: `${job.NPWP}:${job.ID}`, removeOnComplete: true },
-      }))
-    );
+    if (jobs.length) {
+      log.debug({}, 'LoadPut03Producer: %d jobs', jobs.length);
+      LoadPut03Queue.addBulk(
+        jobs.map((job) => ({
+          data: { npwp: job.NPWP, sptId: job.ID },
+          opts: { jobId: `${job.NPWP}:${job.ID}`, removeOnComplete: true },
+        }))
+      );
+    }
   })
 );
 
@@ -62,11 +72,14 @@ SummarizeProducer.add({}, { jobId: 'SummarizeQueue', repeat: { cron: '*/1 * * * 
 
 SummarizeProducer.process(() =>
   getJobSummarize().then((jobs) => {
-    SummarizeQueue.addBulk(
-      jobs.map((job) => ({
-        data: { npwp: job.NPWP, sptId: job.ID },
-        opts: { jobId: `${job.NPWP}:${job.ID}`, removeOnComplete: true },
-      }))
-    );
+    if (jobs.length) {
+      log.debug({}, 'SummarizeProducer: %d jobs', jobs.length);
+      SummarizeQueue.addBulk(
+        jobs.map((job) => ({
+          data: { npwp: job.NPWP, sptId: job.ID },
+          opts: { jobId: `${job.NPWP}:${job.ID}`, removeOnComplete: true },
+        }))
+      );
+    }
   })
 );
