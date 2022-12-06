@@ -86,7 +86,8 @@ async function processJobLoadPut03(job) {
     draftSpt.MS_PAJAK
   );
 
-  const dbPayload = prepareDbPayload(dataTransaksi, sptId);
+  const dbPayload = await prepareDbPayload(dataTransaksi, sptId);
+  log.trace("Finish preparing data to be inserted to DB 'SPT_1107PUT");
   await insertDataPihakLainToDb(dbPayload);
   return 'ok';
 }
